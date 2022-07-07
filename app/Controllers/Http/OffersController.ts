@@ -1,5 +1,4 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { scope } from '@ioc:Adonis/Lucid/Orm'
 import Offer from 'App/Models/Offer'
 import CreateOfferValidator from 'App/Validators/CreateOfferValidator'
 
@@ -49,9 +48,8 @@ export default class OffersController {
     return response.ok('Offer deleted')
   }
 
-  /* public async offerUsers({ request, response }: HttpContextContract) {
-    query().withScopes((scope)) => {
-      scopes.visibleTo(auth.user)
-        }
-  }*/
+  public async OU({ response }: HttpContextContract) {
+    const ofus = await Offer.query().apply((scopes) => scopes.visibleTo())
+    return response.json(ofus)
+  }
 }

@@ -11,7 +11,7 @@ Route.group(() => {
 }).prefix('/api')
 
 Route.group(() => {
-  Route.get('/UO', 'OffersController').middleware('auth')
+  Route.get('/OU', 'OffersController').middleware('auth')
 }).prefix('/api')
 
 Route.get('health', async ({ response }) => {

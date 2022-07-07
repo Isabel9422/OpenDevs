@@ -60,12 +60,13 @@ export default class Offer extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  public static visibleTo = scope((query, user: User, auth) => {
+  public static visibleTo = scope((query, user: User, client: Client) => {
     if (user.admin === true) {
       return // ADMIN PUEDEN HACER LO QUE QUIEREN USERS GESTIONAR SUS PROPIAS OFERTAS Y EMPRESAS
     }
-    query.whereIn('id', user.id)
+    return query.where('client_id', client.id).where('client.id', user.clientId)
     //return offers
   })
   // intento que me de todas las ofertas de un usuario
+  //muestra las ofertas, users a traves de empresas y a traves de ofertas
 }
