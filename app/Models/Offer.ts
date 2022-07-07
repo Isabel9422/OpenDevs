@@ -61,10 +61,10 @@ export default class Offer extends BaseModel {
   public updatedAt: DateTime
 
   public static visibleTo = scope((query, user: User, auth) => {
-    /* if (user.isAdmin) {
-      return (esto en blanco) ADMIN PUEDEN HACER LO QUE QUIEREN USERS GESTIONAR SUS PROPIAS OFERTAS Y EMPRESAS
-      query.whereIn('id', '=', user)
-    }*/
+    if (user.admin === true) {
+      return // ADMIN PUEDEN HACER LO QUE QUIEREN USERS GESTIONAR SUS PROPIAS OFERTAS Y EMPRESAS
+    }
+    query.whereIn('id', user.id)
     //return offers
   })
   // intento que me de todas las ofertas de un usuario
