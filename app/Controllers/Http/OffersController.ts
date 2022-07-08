@@ -52,4 +52,8 @@ export default class OffersController {
     const ofus = await Offer.query().apply((scopes) => scopes.visibleTo())
     return response.json(ofus)
   }
+
+  public async filters({ response, params: { experienceYears } }: HttpContextContract) {
+    return Offer.query().where('experience_years', experienceYears).firstOrFail()
+  }
 }
