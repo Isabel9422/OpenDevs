@@ -63,9 +63,4 @@ export default class OffersController {
     await offer.delete()
     return response.ok('Offer deleted')
   }
-
-  public async OU({ response }: HttpContextContract) {
-    const ofus = await Offer.query().apply((scopes) => scopes.visibleTo())
-    return response.json(ofus)
-  }
 }
