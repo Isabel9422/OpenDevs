@@ -3,9 +3,25 @@ import Offer from 'App/Models/Offer'
 import CreateOfferValidator from 'App/Validators/CreateOfferValidator'
 
 export default class OffersController {
-  public async index({ response }: HttpContextContract) {
-    const offer = await Offer.all()
-    return response.json(offer)
+  public async index({ response, request, auth }: HttpContextContract) {
+    const title = request.input('title') ?? null
+    const experience = request.input('experience_years') ?? null
+    const typ = request.input('type') ?? null
+    const price = request.input('price') ?? null
+    const client = request.input('clientId') ?? null
+    const location = request.input('location') ?? null
+
+    const offers = await Offer.query()
+      .withScopes((scopes) => {
+        if (auth.user) scopes.visibleTo(auth.user)
+      })
+      .if(title, (query) => query.where('title', 'like', `%${title}%`))
+      .if(experience, (query) => query.where('experience_years', '<=', experience))
+      .if(typ, (query) => query.where('type', typ))
+      .if(price, (query) => query.where('price', '>=', price))
+      .if(client, (query) => query.where('client_id', client))
+      .if(location, (query) => query.where('location', 'like', `%${location}%`))
+    response.ok({ data: offers })
   }
 
   public async show({ params: { id }, response }: HttpContextContract) {
@@ -51,9 +67,5 @@ export default class OffersController {
   public async OU({ response }: HttpContextContract) {
     const ofus = await Offer.query().apply((scopes) => scopes.visibleTo())
     return response.json(ofus)
-  }
-
-  public async filters({ response, params: { experienceYears } }: HttpContextContract) {
-    return Offer.query().where('experience_years', experienceYears).firstOrFail()
   }
 }
