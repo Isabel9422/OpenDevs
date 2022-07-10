@@ -10,6 +10,8 @@ Route.group(() => {
   Route.resource('/languages', 'LanguagesController').apiOnly()
 }).prefix('/api')
 
+Route.get('offers/', 'OffersController.index').middleware('auth')
+
 Route.get('health', async ({ response }) => {
   const report = await HealthCheck.getReport()
 

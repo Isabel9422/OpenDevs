@@ -67,6 +67,5 @@ export default class Offer extends BaseModel {
     return query.where('client_id', client.id).where('client.id', user.clientId)
     //return offers
   })
-  // intento que me de todas las ofertas de un usuario
   //muestra las ofertas, users a traves de empresas y a traves de ofertas
 }
