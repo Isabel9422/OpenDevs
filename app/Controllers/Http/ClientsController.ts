@@ -3,9 +3,19 @@ import Client from 'App/Models/Client'
 import CreateClientValidator from 'App/Validators/CreateClientValidator'
 
 export default class ClientsController {
-  public async index({ response }: HttpContextContract) {
-    const clients = await Client.all()
-    return response.json(clients)
+  public async index({ response, request }: HttpContextContract) {
+    const names = request.input('name') ?? null
+    const descriptions = request.input('description') ?? null
+    const founded = request.input('founded') ?? null
+    const url = request.input('url') ?? null
+
+    const clients = await Client.query()
+      .if(names, (query) => query.where('name', 'like', `%${names}%`))
+      .if(descriptions, (query) => query.where('description', 'like', `%${descriptions}%`))
+      .if(founded, (query) => query.where('founded', 'like', `%${founded}%`))
+      .if(url, (query) => query.where('url', 'like', `%${url}%`))
+
+    response.ok({ data: clients })
   }
 
   public async show({ params: { id }, response }: HttpContextContract) {
