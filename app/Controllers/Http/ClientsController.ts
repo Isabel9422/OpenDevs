@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Client from 'App/Models/Client'
 import CreateClientValidator from 'App/Validators/CreateClientValidator'
+import SortClientValidator from 'App/Validators/SortClientValidator'
 
 export default class ClientsController {
   public async index({ response, request }: HttpContextContract) {
@@ -8,13 +9,16 @@ export default class ClientsController {
     const descriptions = request.input('description') ?? null
     const founded = request.input('founded') ?? null
     const url = request.input('url') ?? null
+    const datosvalidados = await request.validate(SortClientValidator)
+    const sort = datosvalidados.sort || 'id'
+    const order = datosvalidados.order || 'asc'
 
     const clients = await Client.query()
       .if(names, (query) => query.where('name', 'like', `%${names}%`))
       .if(descriptions, (query) => query.where('description', 'like', `%${descriptions}%`))
       .if(founded, (query) => query.where('founded', 'like', `%${founded}%`))
       .if(url, (query) => query.where('url', 'like', `%${url}%`))
-
+      .orderBy(sort, order)
     response.ok({ data: clients })
   }
 

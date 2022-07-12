@@ -34,8 +34,10 @@ import User from 'App/Models/User'
 export const { actions } = Bouncer
 
 Bouncer.define('deleteOffer', (user: User, offer: Offer) => {
-    if(user.admin===true) {
-  return offer.user_id === user.id
+  if (user.admin) {
+    return
+  }
+  return offer.clientId === user.id
 })
 
 /*
@@ -62,3 +64,8 @@ Bouncer.define('deleteOffer', (user: User, offer: Offer) => {
 |****************************************************************
 */
 export const { policies } = Bouncer.registerPolicies({})
+/*
+| 	Bouncer.registerPolicies({
+    |			UserPolicy: () => import('App/Policies/User'),
+    | 		PostPolicy: () => import('App/Policies/Post')
+    | 	})*/

@@ -1,26 +1,31 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Offer from 'App/Models/Offer'
 import CreateOfferValidator from 'App/Validators/CreateOfferValidator'
+import SortOfferValidator from 'App/Validators/SortOfferValidator'
 
 export default class OffersController {
   public async index({ response, request, auth }: HttpContextContract) {
     const title = request.input('title') ?? null
-    const experience = request.input('experience_years') ?? null
-    const typ = request.input('type') ?? null
+    const experienceYears = request.input('experience_years') ?? null
+    const type = request.input('type') ?? null
     const price = request.input('price') ?? null
     const client = request.input('clientId') ?? null
     const location = request.input('location') ?? null
+    const datosvalidados = await request.validate(SortOfferValidator)
+    const sort = datosvalidados.sort || 'id'
+    const order = datosvalidados.order || 'asc'
 
     const offers = await Offer.query()
       .withScopes((scopes) => {
         if (auth.user) scopes.visibleTo(auth.user)
       })
       .if(title, (query) => query.where('title', 'like', `%${title}%`))
-      .if(experience, (query) => query.where('experience_years', '<=', experience))
-      .if(typ, (query) => query.where('type', typ))
+      .if(experienceYears, (query) => query.where('experience_years', '<=', experienceYears))
+      .if(type, (query) => query.where('type', type))
       .if(price, (query) => query.where('price', '>=', price))
       .if(client, (query) => query.where('client_id', client))
       .if(location, (query) => query.where('location', 'like', `%${location}%`))
+      .orderBy(sort, order)
     response.ok({ data: offers })
   }
 
