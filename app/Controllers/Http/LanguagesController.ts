@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Language from 'App/Models/Language'
 import CreateLanguageValidator from 'App/Validators/CreateLanguageValidator'
+import UpdateLanguageValidator from 'App/Validators/UpdateLanguageValidator'
 
 export default class LanguagesController {
   public async index({ response }: HttpContextContract) {
@@ -25,7 +26,12 @@ export default class LanguagesController {
 
   public async update({ request, response }: HttpContextContract) {
     const language = await Language.findByOrFail('id', request.params().id)
-    await language.merge(request.all()).save()
+    const validateData = await request.validate(UpdateLanguageValidator)
+    const isEmpty = Object.entries(validateData).length === 0
+    if (isEmpty) {
+      return response.badRequest()
+    }
+    await language.merge(validateData).save()
     return response.ok({ data: language })
   }
 

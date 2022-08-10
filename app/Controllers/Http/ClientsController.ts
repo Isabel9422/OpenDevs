@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Client from 'App/Models/Client'
 import CreateClientValidator from 'App/Validators/CreateClientValidator'
 import SortClientValidator from 'App/Validators/SortClientValidator'
+import UpdateClientValidator from 'App/Validators/UpdateClientValidator'
 
 export default class ClientsController {
   public async index({ response, request }: HttpContextContract) {
@@ -38,7 +39,12 @@ export default class ClientsController {
 
   public async update({ request, response }: HttpContextContract) {
     const client = await Client.findByOrFail('id', request.params().id)
-    await client.merge(request.all()).save()
+    const validateData = await request.validate(UpdateClientValidator)
+    const isEmpty = Object.entries(validateData).length === 0
+    if (isEmpty) {
+      return response.badRequest()
+    }
+    await client.merge(validateData).save()
     return response.ok({ data: client })
   }
 

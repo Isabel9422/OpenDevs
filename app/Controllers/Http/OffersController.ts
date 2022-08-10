@@ -1,8 +1,8 @@
-import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Offer from 'App/Models/Offer'
 import CreateOfferValidator from 'App/Validators/CreateOfferValidator'
 import SortOfferValidator from 'App/Validators/SortOfferValidator'
+import UpdateOfferValidator from 'App/Validators/UpdateOfferValidator'
 
 export default class OffersController {
   public async index({ response, request, auth }: HttpContextContract) {
@@ -57,10 +57,15 @@ export default class OffersController {
     return response.created({ data: offer })
   }
 
-  public async update({ params: { id }, response, request, bouncer }: HttpContextContract) {
-    const offer = await Offer.findByOrFail('id', id)
+  public async update({ response, request, bouncer }: HttpContextContract) {
+    const offer = await Offer.findByOrFail('id', request.params().id)
     await bouncer.authorize('editOffer', offer)
-    await offer.merge(request.all()).save()
+    const validateData = await request.validate(UpdateOfferValidator)
+    const isEmpty = Object.entries(validateData).length === 0
+    if (isEmpty) {
+      return response.badRequest()
+    }
+    await offer.merge(validateData).save()
     return response.ok({ data: offer })
   }
 
