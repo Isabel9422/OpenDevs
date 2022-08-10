@@ -14,4 +14,4 @@ Y sobre las ofertas: https://opendevs-deploy.herokuapp.com/api/offers
 
 La API permite buscar y ordenar las ofertas eligiendo los criterios que se deseen.
 
-Además, los usuarios podrán crear ofertas, pero solo los usuarios que hayan creado dichas ofertas, podrán editarlas y/o eliminarlas.
+Además, los usuarios podrán crear ofertas, pero solo los usuarios que hayan creado dichas ofertas, podrán editarlas y/o eliminarlas. (Con el token del admin se podría acceder a las ofertas: https://opendevs-deploy.herokuapp.com/offers)
