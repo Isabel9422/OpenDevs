@@ -62,10 +62,8 @@ export default class Offer extends BaseModel {
 
   public static visibleTo = scope((query, user: User, client: Client) => {
     if (user.admin === true) {
-      return // ADMIN PUEDEN HACER LO QUE QUIEREN USERS GESTIONAR SUS PROPIAS OFERTAS Y EMPRESAS
+      return
     }
     return query.where('client_id', client.id).where('client.id', user.clientId)
-    //return offers
   })
-  //muestra las ofertas, users a traves de empresas y a traves de ofertas
 }

@@ -1,3 +1,4 @@
+import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Offer from 'App/Models/Offer'
 import CreateOfferValidator from 'App/Validators/CreateOfferValidator'
@@ -47,7 +48,6 @@ export default class OffersController {
     const offer = await Offer.create(validateData)
 
     if (validateData.technologies) {
-      console.log('Hey !')
       await offer.related('technologies').sync(validateData.technologies)
       if (validateData.languages) {
         await offer.related('languages').sync(validateData.languages)
@@ -57,14 +57,16 @@ export default class OffersController {
     return response.created({ data: offer })
   }
 
-  public async update({ params: { id }, response, request }: HttpContextContract) {
+  public async update({ params: { id }, response, request, bouncer }: HttpContextContract) {
     const offer = await Offer.findByOrFail('id', id)
+    await bouncer.authorize('editOffer', offer)
     await offer.merge(request.all()).save()
     return response.ok({ data: offer })
   }
 
-  public async destroy({ request, response }: HttpContextContract) {
+  public async destroy({ request, response, bouncer }: HttpContextContract) {
     const offer = await Offer.findByOrFail('id', request.params().id)
+    await bouncer.authorize('deleteOffer', offer)
     await offer.delete()
     return response.ok('Offer deleted')
   }

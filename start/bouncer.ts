@@ -6,8 +6,9 @@
  */
 
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
-import Offer from 'App/Models/Offer'
 import User from 'App/Models/User'
+import Logger from '@ioc:Adonis/Core/Logger'
+import Offer from 'App/Models/Offer'
 
 /*
 |--------------------------------------------------------------------------
@@ -31,14 +32,36 @@ import User from 'App/Models/User'
 | NOTE: Always export the "actions" const from this file
 |****************************************************************
 */
-export const { actions } = Bouncer
-
-Bouncer.define('deleteOffer', (user: User, offer: Offer) => {
-  if (user.admin) {
-    return
+export const { actions } = Bouncer.before((user: User | null) => {
+  if (user?.admin) {
+    return true
   }
-  return offer.clientId === user.id
 })
+  .after((user: User | null, actionName, actionResult) => {
+    const userType = user ? !user.admin : 'GUEST'
+
+    actionResult.authorized
+      ? Logger.info(`${userType} fue autorizado para ${actionName}`)
+      : Logger.info(
+          `${userType} fue denegado para ${actionName} porque ${actionResult.errorResponse}`
+        )
+  })
+
+  .define(
+    'editOffer',
+    (user: User, offer: Offer) => {
+      return user.id === offer.clientId
+    },
+    { allowGuest: true }
+  )
+
+  .define(
+    'deleteOffer',
+    (user: User, offer: Offer) => {
+      return user.id === offer.clientId
+    },
+    { allowGuest: true }
+  )
 
 /*
 |--------------------------------------------------------------------------
